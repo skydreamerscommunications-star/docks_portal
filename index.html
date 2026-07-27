@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>SDC Disciplinary Actions</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: #eef3fb;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 24px;
+  }
+  .card {
+    width: min(820px, 100%);
+    background: #ffffff;
+    border-radius: 26px;
+    padding: 36px 40px 32px;
+    box-shadow: 0 20px 60px rgba(31, 73, 125, 0.10);
+    transition: box-shadow 0.25s ease;
+  }
+  .card--submitted { box-shadow: 0 20px 60px rgba(31, 73, 125, 0.06); }
+  .logo {
+    width: 68px;
+    height: 68px;
+    margin: 0 auto 16px;
+    border-radius: 18px;
+    background: linear-gradient(135deg, #2f6df5, #5b95ff);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-weight: 800;
+    font-size: 28px;
+    letter-spacing: -1px;
+    user-select: none;
+  }
+  h1 {
+    margin: 0;
+    text-align: center;
+    font-size: 30px;
+    font-weight: 700;
+    color: #22314d;
+    letter-spacing: -0.3px;
+  }
+  .sub {
+    margin: 6px 0 26px;
+    text-align: center;
+    color: #68768f;
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 1.5;
+  }
+  .field { margin-bottom: 14px; }
+  .field label {
+    display: block;
+    margin-bottom: 6px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #34435e;
+    letter-spacing: -0.2px;
+  }
+  .field input, .field select {
+    width: 100%;
+    height: 48px;
+    border: 1px solid #d8e2f2;
+    border-radius: 14px;
+    padding: 0 16px;
+    font-size: 15px;
+    font-weight: 400;
+    font-family: inherit;
+    color: #1e2b3f;
+    background: #ffffff;
+    outline: none;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    appearance: auto;
+  }
+  .field input::placeholder { color: #a8b6ce; }
+  .field input:focus, .field select:focus {
+    border-color: #3f7cff;
+    box-shadow: 0 0 0 4px rgba(63, 124, 255, 0.10);
+  }
+  .field input:disabled, .field select:disabled {
+    background: #f5f8fd;
+    opacity: 0.7;
+    cursor: not-allowed;
+  }
+  .submit-wrap { margin-top: 6px; }
+  .submit-btn {
+    width: 100%;
+    height: 54px;
+    border: none;
+    border-radius: 16px;
+    background: linear-gradient(90deg, #2f6df5, #3678f6);
+    color: #ffffff;
+    font-size: 17px;
+    font-weight: 700;
+    font-family: inherit;
+    cursor: pointer;
+    transition: opacity 0.2s ease, transform 0.15s ease, box-shadow 0.2s ease;
+    letter-spacing: -0.2px;
+    position: relative;
+  }
+  .submit-btn:hover:not(:disabled) {
+    box-shadow: 0 8px 24px rgba(47, 109, 245, 0.30);
+    transform: translateY(-1px);
+  }
+  .submit-btn:active:not(:disabled) {
+    transform: translateY(0px);
+    box-shadow: 0 4px 12px rgba(47, 109, 245, 0.25);
+  }
+  .submit-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+  }
+  .submit-btn .btn-text { display: inline-block; }
+  .submit-btn .spinner {
+    display: none;
+    width: 22px;
+    height: 22px;
+    margin: 0 auto;
+    border: 2.5px solid rgba(255, 255, 255, 0.25);
+    border-top-color: #ffffff;
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+  }
+  .submit-btn.is-loading .btn-text { display: none; }
+  .submit-btn.is-loading .spinner { display: block; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .message {
+    margin-top: 16px;
+    padding: 14px 18px;
+    border-radius: 14px;
+    font-size: 15px;
+    font-weight: 500;
+    line-height: 1.5;
+    display: none;
+    align-items: center;
+    gap: 10px;
+  }
+  .message--success {
+    display: flex;
+    background: #e8f5ee;
+    color: #0e6245;
+    border: 1px solid #b8dfd0;
+  }
+  .message--error {
+    display: flex;
+    background: #fdf0ed;
+    color: #a33a2e;
+    border: 1px solid #f5d4ce;
+  }
+  .message--success .msg-icon, .message--error .msg-icon {
+    flex-shrink: 0;
+    font-size: 20px;
+    line-height: 1;
+  }
+  .message .msg-text { flex: 1; }
+  @media (max-width: 700px) {
+    .card { padding: 28px 20px 24px; }
+    h1 { font-size: 26px; }
+    .logo { width: 60px; height: 60px; font-size: 24px; }
+    .submit-btn { height: 50px; font-size: 16px; }
+    .field input, .field select { height: 46px; font-size: 14px; }
+  }
+  @media (max-width: 440px) {
+    body { padding: 12px; }
+    .card { padding: 22px 16px 20px; border-radius: 20px; }
+    h1 { font-size: 22px; }
+    .sub { font-size: 13px; margin-bottom: 20px; }
+    .field label { font-size: 13px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="card" id="app">
+  <div class="logo">SDC</div>
+  <h1>SDC Disciplinary Actions</h1>
+  <div class="sub">Record Payroll Deductions</div>
+
+  <form id="disciplinaryForm" novalidate>
+    <div class="field">
+      <label for="agent">Agent</label>
+      <select id="agent" required>
+        <option value="">Select Agent</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label for="reason">Reason</label>
+      <input id="reason" type="text" placeholder="e.g. Late Arrival, NCNS, Misconduct" autocomplete="off" required />
+    </div>
+
+    <div class="field">
+      <label for="amount">Amount (PKR)</label>
+      <input id="amount" type="number" placeholder="e.g. 200, 500, 1000, 0" min="0" step="1" autocomplete="off" required />
+    </div>
+
+    <div class="submit-wrap">
+      <button class="submit-btn" type="submit" id="submitBtn">
+        <span class="btn-text">Submit Deduction</span>
+        <span class="spinner"></span>
+      </button>
+    </div>
+  </form>
+
+  <div class="message" id="message" role="alert">
+    <span class="msg-icon"></span>
+    <span class="msg-text"></span>
+  </div>
+</div>
+
+<script>
+  (function() {
+    'use strict';
+
+    const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbwyTDzRi6AhxpOWv47ssN9IQGRz9FpsvWtNS52ZPTmL8-ml1qKt-cV4bfxseJxQQF6F/exec';
+
+    const form = document.getElementById('disciplinaryForm');
+    const submitBtn = document.getElementById('submitBtn');
+    const messageEl = document.getElementById('message');
+    const agentSelect = document.getElementById('agent');
+    const reasonInput = document.getElementById('reason');
+    const amountInput = document.getElementById('amount');
+
+    function showMessage(type, text) {
+      messageEl.className = 'message message--' + type;
+      const icon = messageEl.querySelector('.msg-icon');
+      const txt = messageEl.querySelector('.msg-text');
+      icon.textContent = type === 'success' ? '✓' : '✕';
+      txt.textContent = text;
+      messageEl.style.display = 'flex';
+    }
+
+    function hideMessage() {
+      messageEl.className = 'message';
+      messageEl.style.display = 'none';
+    }
+
+    function setLoading(loading) {
+      if (loading) {
+        submitBtn.classList.add('is-loading');
+        submitBtn.disabled = true;
+      } else {
+        submitBtn.classList.remove('is-loading');
+        submitBtn.disabled = false;
+      }
+    }
+
+    function resetForm() {
+      form.reset();
+      agentSelect.value = '';
+      const inputs = form.querySelectorAll('input, select');
+      inputs.forEach(el => el.disabled = false);
+    }
+
+    function validateForm() {
+      const agent = agentSelect.value;
+      const reason = reasonInput.value.trim();
+      const amount = amountInput.value.trim();
+
+      if (!agent) { showMessage('error', 'Please select an agent.'); return false; }
+      if (!reason) { showMessage('error', 'Please enter a reason for the deduction.'); return false; }
+      if (reason.length < 2) { showMessage('error', 'Reason must be at least 2 characters.'); return false; }
+      if (amount === '') { showMessage('error', 'Please enter the deduction amount.'); return false; }
+      if (isNaN(amount) || Number(amount) < 0) { showMessage('error', 'Amount must be a valid positive number or 0.'); return false; }
+
+      hideMessage();
+      return true;
+    }
+
+    function loadAgents() {
+      fetch(WEB_APP_URL, { method: 'GET' })
+        .then(response => response.json())
+        .then(data => {
+          if (data.agents && Array.isArray(data.agents)) {
+            agentSelect.innerHTML = '<option value="">Select Agent</option>';
+            data.agents.forEach(function(agentName) {
+              const option = document.createElement('option');
+              option.value = agentName;
+              option.textContent = agentName;
+              agentSelect.appendChild(option);
+            });
+          } else {
+            showMessage('error', 'Could not load agent list.');
+          }
+        })
+        .catch(error => {
+          showMessage('error', 'Network error. Could not load agent list.');
+          console.error('Fetch error:', error);
+        });
+    }
+
+    form.addEventListener('submit', function(e) {
+      e.preventDefault();
+      hideMessage();
+
+      if (!validateForm()) return;
+
+      const params = new URLSearchParams();
+      params.append('agent', agentSelect.value);
+      params.append('reason', reasonInput.value.trim());
+      params.append('amount', amountInput.value.trim());
+
+      setLoading(true);
+
+      fetch(WEB_APP_URL, {
+        method: 'POST',
+        body: params
+      })
+      .then(response => response.json())
+      .then(result => {
+        setLoading(false);
+        if (result.status === 'success') {
+          showMessage('success', '✓ Payroll deduction recorded successfully.');
+          submitBtn.disabled = true;
+          const inputs = form.querySelectorAll('input, select');
+          inputs.forEach(el => el.disabled = true);
+          setTimeout(function() {
+            resetForm();
+            const inputs2 = form.querySelectorAll('input, select');
+            inputs2.forEach(el => el.disabled = false);
+            submitBtn.disabled = false;
+            hideMessage();
+          }, 3000);
+        } else {
+          showMessage('error', result.message || 'Something went wrong. Please try again.');
+          submitBtn.disabled = false;
+        }
+      })
+      .catch(error => {
+        setLoading(false);
+        showMessage('error', 'Network error. Could not reach the server. Please check your connection.');
+        submitBtn.disabled = false;
+        console.error('Fetch error:', error);
+      });
+    });
+
+    form.querySelectorAll('input, select').forEach(el => {
+      el.addEventListener('input', hideMessage);
+      el.addEventListener('change', hideMessage);
+    });
+
+    loadAgents();
+
+    console.log('SDC Disciplinary Actions Portal ready. Backend URL:', WEB_APP_URL);
+  })();
+</script>
+
+</body>
+</html>
